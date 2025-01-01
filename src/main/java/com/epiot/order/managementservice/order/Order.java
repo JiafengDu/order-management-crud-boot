@@ -1,42 +1,38 @@
 package com.epiot.order.managementservice.order;
 
+import com.epiot.order.managementservice.orderItem.OrderItem;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
 public class Order {
     @Id
-    @SequenceGenerator(
-            name="order_sequence",
-            sequenceName = "order_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "order_sequence"
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
     private Long userId;
-    private double totalAmount;
-    private String status; // Pending, Shipped, Delivered, Cancelled
-    private String shippingAddress;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDate orderDate;
+
+
+    private BigDecimal totalPrice;
+
 
     public Order() {
-
     }
 
-    public Order(Long userId, double totalAmount, String status, String shippingAddress) {
+    public Order(Long userId) {
         this.userId = userId;
-        this.totalAmount = totalAmount;
-        this.status = status;
-        this.shippingAddress = shippingAddress;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.orderDate = LocalDate.now();
     }
+
 
     public Long getId() {
         return id;
@@ -54,61 +50,42 @@ public class Order {
         this.userId = userId;
     }
 
-    public double getTotalAmount() {
-        return totalAmount;
+
+    public LocalDate getOrderDate() {
+        return orderDate;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setOrderDate(LocalDate orderDate) {
+        this.orderDate = orderDate;
     }
 
-    public String getStatus() {
-        return status;
+
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
-    public String getShippingAddress() {
-        return shippingAddress;
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
     }
 
-    public void setShippingAddress(String shippingAddress) {
-        this.shippingAddress = shippingAddress;
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this); // Maintain the bidirectional relationship
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void removeOrderItem(OrderItem orderItem) {
+        orderItems.remove(orderItem);
+        orderItem.setOrder(null); // Maintain the bidirectional relationship
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @PreUpdate
-    public void updateUpdatedAt() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", totalAmount=" + totalAmount +
-                ", status='" + status + '\'' +
-                ", shippingAddress='" + shippingAddress + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

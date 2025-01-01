@@ -1,4 +1,4 @@
-package com.epiot.order.epiotordermanagementservice;
+package com.epiot.order.managementservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

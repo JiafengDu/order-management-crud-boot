@@ -14,14 +14,11 @@ public class InventoryConfig {
     @Bean
     CommandLineRunner inventoryCommandLineRunner(
             InventoryRepository repository,
-            ProductRepository productRepository) {
+            List<Product> initialProducts) { // Inject the list of products
         return args -> {
-            // You can retrieve products from the database to link inventory to
-            // For example, assuming you have a product with name "Smart Thermostat":
-            Product smartThermostat = productRepository.findByName("Smart Thermostat").orElse(null);
-            Product smartLock = productRepository.findByName("Smart Lock").orElse(null);
-            Product smartLighting = productRepository.findByName("Smart Lighting").orElse(null);
-
+            Product smartThermostat = initialProducts.stream().filter(p -> p.getName().equals("Smart Thermostat")).findFirst().orElse(null);
+            Product smartLock = initialProducts.stream().filter(p -> p.getName().equals("Smart Lock")).findFirst().orElse(null);
+            Product smartLighting = initialProducts.stream().filter(p -> p.getName().equals("Smart Lighting")).findFirst().orElse(null);
 
             if (smartThermostat != null && smartLock != null && smartLighting != null) {
                 Inventory thermostatInventory = new Inventory(smartThermostat, 100);
@@ -30,7 +27,6 @@ public class InventoryConfig {
 
                 repository.saveAll(List.of(thermostatInventory, lockInventory, lightingInventory));
             } else {
-                // Handle the case where the products aren't found (e.g., log a warning)
                 throw new IllegalStateException("One or more products not found for inventory initialization.");
             }
         };
